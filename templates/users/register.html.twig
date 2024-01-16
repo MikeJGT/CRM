@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+{% for message in app.flashes('created') %}
+    <div class="alert alert-success">
+        {{message}}
+    </div>
+{% endfor %}
+
+    {{ form_start(form) }}
+        
+    {{ form_end(form) }}
+{% endblock %}

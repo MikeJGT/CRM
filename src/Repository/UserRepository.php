@@ -43,7 +43,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getAllUsers(){
         return $this->createQueryBuilder('u')
         ->getQuery()
-        ->getResults();
+        ->getResult();
 
     }
 
@@ -62,13 +62,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 //        ;
 //    }
 
-   public function findOneBySomeField($value): ?User
+   public function findOneById($value): ?User
    {
        return $this->createQueryBuilder('u')
-           ->andWhere('u.exampleField = :val')
-           ->setParameter('val', $value)
+           ->andWhere('u.id = :val')
+        //    ->setParameter('val', $value)
            ->getQuery()
-           ->getOneOrNullResult()
+        //    ->getOneOrNullResult()
        ;
    }
 }

@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User List{% endblock %}
+
+{% block body %}
+ {# {{form(form)}} #}
+{{ form_start(form) }}
+        <div class="row">
+            <div class="col">
+                {{form_errors(form)}}
+            </div> 
+        </div>   
+        <div class="row">
+            <div class="col">
+                {{form_row(form.name)}}
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col">
+                {{form_row(form.surname)}}
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col">
+                {{form_row(form.email)}}
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col">
+                {{form_row(form.roles)}}
+            </div> 
+        </div>
+{{ form_end(form) }}
+{% endblock %}
