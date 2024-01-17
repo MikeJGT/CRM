@@ -2,15 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class LoginController extends AbstractController
@@ -32,7 +26,12 @@ class LoginController extends AbstractController
 
         return $this->render('login/index.html.twig', [
             'errors' => $error,
-            'last_username'=>$lastUsername
+            'last_username'=>$lastUsername,
         ]);
+    }
+
+    #[Route('/logout', name: 'logout')]
+    public function logout(){
+        return $this->redirectToRoute('login');
     }
 }

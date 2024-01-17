@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -29,7 +30,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/users/register', name: 'register')]
-    public function create(EntityManagerInterface $em, Request $request): Response
+    public function create(EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
 
@@ -38,6 +39,14 @@ class UsersController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+            $paswordHased = $passwordHasher->hashPassword(
+                $user,
+                $user->getPassword()
+            );
+        //     dd($user,
+        //     $paswordHased    
+        // );
+            $user->setPassword($paswordHased);
             $em->persist($user);
             $em->flush($user);
             $this->addFlash('created','The user was created.');

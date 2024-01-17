@@ -4,7 +4,13 @@
 
 {% block body %}
     {# {{form(last_username)}} #}
-    <form action={{path('login')}} method="post">
+    {# {{ include('flashes/_flash.html.twig') }} #}
+
+    {% if errors %}
+        <div class="alert alert-danger ">{{ errors.messageKey }}<div>
+    {% endif %}
+
+    <form action="{{ path('login') }}" method="post">
         <div class="row">
             <div class="col">
                 <label class="form-label" for="username">Email</label>
