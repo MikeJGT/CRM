@@ -1,0 +1,67 @@
+<style>
+     .wrapper{
+        font-family: 'Times New Roman', Times, serif;
+        
+     }  
+    h1,
+    h3,
+    p{
+
+        font-weight: 400;
+    }
+    h1 {
+        text-align: center;
+        border: 1px solid black;  
+        padding: 20px;  
+        margin-bottom: 50px;
+    }
+    h3 { 
+        color:lightslategray;
+    }
+    p {
+        background-color: #F5F5F5; 
+        padding: 4px 6px; 
+        margin-bottom: 20px;
+    }
+    .flex{
+        display:flex;
+        flex-grow:1;
+    }
+    .spaced{
+        justify-content:space-evenly;
+    }
+    .end{
+        justify-content:flex-end;
+    }
+</style>
+
+<div class="wrapper">
+    <h1>Incident Resume</h1>
+
+    <h3>Assigned to:</h3>
+    <p>{{incident.assigned|capitalize}}</p>
+    
+    <h3>Description:</h3>
+    <p>{{incident.description}}</p>
+
+    <h3>State:</h3>
+    <p>{{incident.state|capitalize}}</p>
+    <div class="flex  spaced">
+        <div class="flex">
+            <h3>Start Date: </h3>
+            <p>{{incident.startDate|date}}</p>
+        </div>
+        <div class="flex">
+            <h3>Finish Date: </h3>
+            {% if incident.state == 'close' %}
+                <p>{{incident.finishDate|date}}</p>
+            {% else %}
+                <p> -  - </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3>Observations:</h3>
+    <p>{{incident.observations}}</p>
+
+</div>

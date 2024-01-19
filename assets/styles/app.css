@@ -2,6 +2,8 @@
 
 body {
     background-color: skyblue;
+    /* color:lightslategray; */
+    font-family: 'Times New Roman', Times, serif;
 }
 .body-container{
     margin-top: 100px;

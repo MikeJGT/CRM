@@ -4,6 +4,8 @@
 
 {% block body %}
 
+<h2> Incidents list </h2>
+
 {{ include('flashes/_flash.html.twig') }}
    
 <table class="table table-striped">
@@ -55,17 +57,27 @@
             {% else %}
                 <p>No files attached</p>
             {% endif %}
-            {# {{incident.brochureFilename}}
-            <a href="{{ asset('uploads/brochures/Guerrero-Aplicacion-Web-desarrollada-en-PHP-usando-el-Framework-Symfony-65a94f67b1ff3.pdf') }}">View brochure (PDF)</a> #}
             </td>
             <td>
-                <a class="link-secondary link-underline-opacity-0" href="{{path('update_incident', {id:incident.id} )}}">
-                Edit <i class="fa-regular fa-pen-to-square"></i>
-                </a>
+                {% if incident.assigned == username %}
+                    <a class="link-secondary link-underline-opacity-0" href="{{path('update_incident', {id:incident.id} )}}">
+                    Edit <i class="fa-regular fa-pen-to-square"></i>
+                    </a>
+                {% else %}
+                    <a class="link-secondary link-underline-opacity-0 disabled" href="#">
+                    Edit <i class="fa-regular fa-pen-to-square"></i>
+                    </a>
+                {% endif %}
             </td>
             <td>
                 <a class="link-danger link-underline-opacity-0" href="{{path('delete_incident', {id:incident.id} )}}">
                    Delete <i class="fa-regular fa-trash-can"></i>
+                </a>
+                <a class="link-secondary link-underline-opacity-0" href="{{path('pdf', {id:incident.id} )}}">
+                   Resume
+                </a>
+                <a class="link-secondary link-underline-opacity-0" href="{{path('zip', {id:incident.id} )}}">
+                   Zip
                 </a>
             </td>
         </tr>

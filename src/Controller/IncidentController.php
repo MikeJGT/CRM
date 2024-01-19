@@ -2,33 +2,35 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Form\IncidentType;
 Use App\Entity\Incident;
 use App\Service\FileUploader;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Repository\IncidentRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Filesystem\Filesystem;
 
 class IncidentController extends AbstractController
 {
-    #[Route('/incident', name: 'incident')]
-    public function index(IncidentRepository $incidentRepository): Response
+    #[Route('/', name: 'incident')]
+    public function index(IncidentRepository $incidentRepository,
+    UserInterface $userInterface ): Response
     {
-
         $incidents = $incidentRepository->getAllIncidents();
-        // dd($incidents);
+        $userName=$userInterface->getName();
+        
         return $this->render('incident/index.html.twig', [
             'incidents' => $incidents,
+            'username' => $userName
         ]);
     }
 
-    #[Route('/incident/create', name: 'create_incident')]
+    #[Route('/create', name: 'create_incident')]
     public function createIncident(
         Request $request, 
         UserInterface $userInterface, 
@@ -40,21 +42,17 @@ class IncidentController extends AbstractController
         $form = $this->createForm(IncidentType::class, $incident);
 
         $form->handleRequest($request);
-        // $user->getName();
-        // dd($user->getName());
 
-        // dd($userInterface->getName());
         if($form->isSubmitted() && $form-> isValid()){
-            $form->getData();
             $incident->setAssigned($userInterface->getName());
             $incident->setStartDate(new DateTime());
             $brochureFile = $form->get('brochure')->getData();
+
             if ($brochureFile) {
                 $brochureFileName = $fileUploader->upload($brochureFile);
                 $incident->setBrochureFilename($brochureFileName);
             }
 
-            // dd($incident);
             $em->persist($incident);
             $em->flush();
             return $this->redirectToRoute('incident');
@@ -65,7 +63,7 @@ class IncidentController extends AbstractController
         ]);
     }
 
-    #[Route('/incident/update/{id}', name: 'update_incident')]
+    #[Route('/update/{id}', name: 'update_incident')]
     public function updateIncident(Request $request, Incident $incident, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(IncidentType::class, $incident);
@@ -74,7 +72,6 @@ class IncidentController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
             if($incident->getState() == 'close'){
-                // dd($incident->getState());
                 $incident->setFinishDate(new DateTime());
             }else{
                 $incident->setFinishDate(null);
@@ -90,23 +87,24 @@ class IncidentController extends AbstractController
         ]);
     }
 
-    #[Route('/incident/delete/{id}', name: 'delete_incident')]
+    #[Route('/delete/{id}', name: 'delete_incident', methods: ['GET'])]
     public function deleteIncident(EntityManagerInterface $em, Incident $incident): Response
-    {
+    {   
+        $fileSystem = new Filesystem();
+        $fileName = $incident->getBrochureFilename();
+        $fileSystem->remove('uploads/brochures/' . $fileName);
+
         $em->remove($incident);
         $em->flush();
-        // $incidents = $incidentRepository->getAllIncidents();
 
         return $this->redirectToRoute('incident');
     }
 
-    #[Route('/incident/download/{id}', name: 'download_incident')]
+    #[Route('/download/{id}', name: 'download_incident', methods: ['GET'])]
     public function downloadIncident(Incident $incident): Response
     {
         $fileName=$incident->getBrochureFilename();
-
-        // $incidents = $incidentRepository->getAllIncidents();
-
-        return $this->file('uploads/brochures/' . $fileName, 'Incident'. '-' . $incident->getAssigned() .'.pdf');
+    
+        return $this->file('uploads/brochures/' . $fileName, 'Incident-' . $incident->getAssigned() . '.pdf');
     }
 }

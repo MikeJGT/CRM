@@ -12,14 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class UsersController extends AbstractController
 {
-    #[Route('/users', name: 'users')]
+    #[Route('/admin', name: 'users')]
     public function index(UserRepository $userRepository): Response
     {
         $userList = $userRepository->getAllUsers();
@@ -29,7 +25,7 @@ class UsersController extends AbstractController
         ]);
     }
 
-    #[Route('/users/register', name: 'register')]
+    #[Route('/admin/register', name: 'register')]
     public function create(EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
@@ -58,7 +54,7 @@ class UsersController extends AbstractController
         ]);
     }
 
-    #[Route('/users/delete/{id}', name: 'delete_user')]
+    #[Route('/admin/delete/{id}', name: 'delete_user')]
     public function deleteUser(EntityManagerInterface $em, User $user): Response
     {
         $em->remove($user);
@@ -68,7 +64,7 @@ class UsersController extends AbstractController
         return $this->redirectToRoute('users');
     }
 
-    #[Route('/users/update/{id}', name: 'update_user')]
+    #[Route('/admin/update/{id}', name: 'update_user')]
     public function updateUser(EntityManagerInterface $em, User $user, Request $request): Response
     {
         // dd($user);
