@@ -3,62 +3,50 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-// use App\Service\ZipFile;
+use App\Service\ZipFile;
 Use App\Entity\Incident;
-use ZipArchive;
+use Symfony\Component\Filesystem\Filesystem;
+use Twig\Environment;
+use Pontedilana\PhpWeasyPrint\Pdf;
 
 //Incorporar servicio ZipFile
 class ZipFileController extends AbstractController
 {
-    #[Route('/zip/file', name: 'app_zip_file')]
-    public function index(): Response
-    {
-        return $this->render('zip_file/index.html.twig', [
-            'controller_name' => 'ZipFileController',
-        ]);
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly Pdf $weasyPrint,
+    ) {
     }
-
 
     #[Route('/zip/{id}', name: 'zip')]
     public function createZip( Incident $incidents)
     {   
+        $fileSystem = new Filesystem();
+        $zipAchive=new ZipFile($this->twig, $this->weasyPrint);
         $fileName='uploads/brochures/'.$incidents->getBrochureFilename();
-        $pdf='incident.pdf';
 
-        $files=[
-            $fileName,
-            $pdf
-        ];
-        $zipPath =$this->generatezip($files);
-
-
-        return new BinaryFileResponse($zipPath);
-    }
-
-
-    //Borrar esto
-    private function generateZip($files)
-    {
-        $zip = new ZipArchive();
-        $zipPath = sys_get_temp_dir() . '/incident.zip';
-
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-            // Add files to the ZIP archive
-
-            foreach($files as $file){
-                //Check filename output
-                $zip->addFile($file);
-                
-            }
-
-            $zip->close();
-
-            return $zipPath;
-        } else {
-            return null; // Error handling
+        $brochures=$incidents->getBrochures();
+        $files=[];
+        foreach($brochures as $brochure){
+            $name='uploads/brochures/'.$brochure->getFileName();
+            array_push($files, $name);
         }
+
+        //Descarga del pdf del propio incidente en local
+        $this->forward('App\Controller\PDFController::savePdfLocal', [
+            'id' => $incidents->getId(),
+        ]);
+        
+        $namepdf='incident-'.$incidents->getAssigned().'.pdf';
+        array_push($files, $namepdf);
+
+        $response =$zipAchive->generatezip($incidents,$files);
+        
+        //Elimina el archivo despues de descargar el pdf. 
+        $fileSystem->remove('incident-'.$incidents->getAssigned().'.pdf');
+
+        return $response;
     }
+
 }

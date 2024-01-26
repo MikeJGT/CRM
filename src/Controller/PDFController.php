@@ -7,11 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pontedilana\PhpWeasyPrint\Pdf;
-use Pontedilana\WeasyprintBundle\WeasyPrint\Response\PdfResponse;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Twig\Environment;
+use App\Service\PdfManager;
 
-//Dividir funcionalidad en servicio PDF
 class PDFController extends AbstractController
 {
     public function __construct(
@@ -20,28 +18,30 @@ class PDFController extends AbstractController
     ) {
     }
 
-    #[Route('/pdf/{id}', name: 'pdf')]
-    public function pdf(Incident $incident): Response
+    #[Route('/pdf/{id}', name: 'pdf_live')]
+    public function renderPdfLive(Incident $incident): Response
     {
-        $html = $this->twig->render('pdf/index.html.twig',[
-            'incident' => $incident
-        ]);
-        $pdfContent =$this->weasyPrint->getOutputFromHtml($html);
-        $pdfPath = $this->getParameter('kernel.project_dir') . '/public/incident.pdf';
+        $pdfManager = new PdfManager($this->twig, $this->weasyPrint);
 
-        //Guardar en /public
-        $this->weasyPrint->generateFromHtml($html, $pdfPath, [], true);
+        $pdfFromTemplate='pdf/index.html.twig';
+        $templateParams= ['incident' => $incident];
 
-        //Renderizar pdf online
-        return new PdfResponse(
-            content: $pdfContent,
-            fileName: 'Incident_' . $incident->getAssigned() . '.pdf',
-            contentType: 'application/pdf',
-            contentDisposition: ResponseHeaderBag::DISPOSITION_INLINE,
-            // or download the file instead of displaying it in the browser with
-            // contentDisposition: ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            status: 200,
-            headers: []
-        );
+        return $pdfManager->renderPdfLive($incident, $pdfFromTemplate, $templateParams);
+    }
+
+    //Ruta para descargar el pdf en Local.
+    #[Route('/pdf/local/{id}', name: 'pdf_local')]
+    public function savePdfLocal(Incident $incident)
+    {
+        $pdfManager = new PdfManager($this->twig, $this->weasyPrint);
+
+        $pdfTemplate='pdf/index.html.twig';
+        $templateParams= ['incident' => $incident];
+        
+        //Ruta local + nombre del pdf
+        $pdfLocalPath = $this->getParameter('kernel.project_dir') . '/public/incident-'.$incident->getAssigned().'.pdf';
+        $pdfManager->savePDFLocal($pdfTemplate,$templateParams,$pdfLocalPath);
+
+        return $this->redirectToRoute('incident');
     }
 }

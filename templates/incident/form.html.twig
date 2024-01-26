@@ -3,9 +3,16 @@
 {% block title %}Hello IncidentController!{% endblock %}
 
 {% block body %}
-
+<div class="wrapper">
+    
+    
+<h2>Add new Ticket</h2>
 {{ include('flashes/_flash.html.twig') }}
 
-{{form(form)}}
+
+    <div class="bg-light px-4 py-4 round-borders">
+        {{form(form)}}  
+    </div>
+</div>
 
 {% endblock %}

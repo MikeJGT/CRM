@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\IncidentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Date;
@@ -39,21 +41,17 @@ class Incident
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $brochureFilename = null;
 
-    // // Upload File
-    // #[ORM\Column(type: 'string', nullable: true)]
-    // private ?string $brochureFilename = null;
+    #[ORM\OneToMany(mappedBy: 'incident', targetEntity: Brochure::class, orphanRemoval: true)]
+    private Collection $brochures;
 
-    // public function getBrochureFilename(): string
-    // {
-    //     return $this->brochureFilename;
-    // }
+    public function __construct()
+    {
+        $this->brochures = new ArrayCollection();
+    }
 
-    // public function setBrochureFilename(string $brochureFilename): self
-    // {
-    //     $this->brochureFilename = $brochureFilename;
-
-    //     return $this;
-    // }
+    // Upload File
+    // Guardar varios archivos setBrouchure to [].
+    // Nuva tabla de datos para guardar la referencia de los archivos.
 
     public function getId(): ?int
     {
@@ -152,6 +150,36 @@ class Incident
     public function setBrochureFilename(?string $brochureFilename): static
     {
         $this->brochureFilename = $brochureFilename;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Brochure>
+     */
+    public function getBrochures(): Collection
+    {
+        return $this->brochures;
+    }
+
+    public function addBrochure(Brochure $brochure): static
+    {
+        if (!$this->brochures->contains($brochure)) {
+            $this->brochures->add($brochure);
+            $brochure->setIncident($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBrochure(Brochure $brochure): static
+    {
+        if ($this->brochures->removeElement($brochure)) {
+            // set the owning side to null (unless already changed)
+            if ($brochure->getIncident() === $this) {
+                $brochure->setIncident(null);
+            }
+        }
 
         return $this;
     }

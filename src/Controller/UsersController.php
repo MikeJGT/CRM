@@ -8,13 +8,61 @@ use App\Form\UpdateUserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UsersController extends AbstractController
 {
+    #[Route('/settings', name: 'settings')]
+    public function changePassword(
+        UserInterface $userInterface, UserRepository $userRepository,
+        Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $form = $this->createFormBuilder()
+        ->add('password', RepeatedType::class, [
+            'type' => PasswordType::class,
+            'invalid_message' => 'The password fields must match.',
+            'options' => ['attr' => ['class' => 'password-field']],
+            // 'required' => true,
+            'first_options'  => ['label' => 'Password'],
+            'second_options' => ['label' => 'Repeat Password'],
+        ])
+        ->add('submit',SubmitType::class)
+        ->getForm();
+
+        $email=$userInterface->getUserIdentifier();
+        $user = $userRepository->findOneByEmail($email);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+        $data=$form->getData();
+        $password=$data['password'];
+        $paswordHased = $passwordHasher->hashPassword(
+            $user,
+            $password
+        );
+        $user->setPassword($paswordHased);
+        // dump($data['password'],$email);
+        // dd($user);
+
+        $em->persist($user);
+        $em->flush();
+        return $this->redirectToRoute('incident');
+        }
+
+        return $this->render('users/settings.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/admin', name: 'users')]
     public function index(UserRepository $userRepository): Response
     {
@@ -39,9 +87,6 @@ class UsersController extends AbstractController
                 $user,
                 $user->getPassword()
             );
-        //     dd($user,
-        //     $paswordHased    
-        // );
             $user->setPassword($paswordHased);
             $em->persist($user);
             $em->flush($user);

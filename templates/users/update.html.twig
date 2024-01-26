@@ -7,31 +7,38 @@
 
 {# {{ include('flashes/_flash.html.twig') }} #}
 
-{{ form_start(form) }}
-        <div class="row">
-            <div class="col">
-                {{form_errors(form)}}
-            </div> 
-        </div>   
-        <div class="row">
-            <div class="col">
-                {{form_row(form.name)}}
-            </div> 
-        </div>
-        <div class="row">
-            <div class="col">
-                {{form_row(form.surname)}}
-            </div> 
-        </div>
-        <div class="row">
-            <div class="col">
-                {{form_row(form.email)}}
-            </div> 
-        </div>
-        <div class="row">
-            <div class="col">
-                {{form_row(form.roles)}}
-            </div> 
-        </div>
-{{ form_end(form) }}
+<div class="wrapper">
+        
+    <h2>Update user</h2>
+
+    <div class="bg-light px-4 py-4 round-borders">
+        {{ form_start(form) }}
+                <div class="row">
+                    <div class="col">
+                        {{form_errors(form)}}
+                    </div> 
+                </div>   
+                <div class="row">
+                    <div class="col">
+                        {{form_row(form.name)}}
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{form_row(form.surname)}}
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{form_row(form.email)}}
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{form_row(form.roles)}}
+                    </div> 
+                </div>
+        {{ form_end(form) }}
+    </div>
+</div>
 {% endblock %}

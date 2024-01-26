@@ -34,7 +34,7 @@ class IncidentType extends AbstractType
             ->add('observations', TextareaType::class)
             ->add('brochure', FileType::class, [
                 'label' => 'Brochure (PDF file)',
-
+                // 'multiple' => true,
                 // unmapped means that this field is not associated to any entity property
                 'mapped' => false,
 

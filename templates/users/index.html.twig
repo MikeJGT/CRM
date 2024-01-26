@@ -5,38 +5,41 @@
 {% block body %}
 
 
-<h2> Users list </h2>
+<div class="">
 
-{{ include('flashes/_flash.html.twig') }}
-    
-<table class="table table-striped">
+    <h2> Users list </h2>
 
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Role</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for user in user_list %}
-        <tr>
-            <th>{{ loop.index }}</th>
-            <td>{{ user.name }}</td>
-            <td>{{ user.surname }}</td>
-            <td>{{ user.roles[0] }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-                <a class="link-secondary link-underline-opacity-0" href="{{path('update_user', {id:user.id} )}}">Update</a>
-            
-                <a class="link-danger link-underline-opacity-0"  href="{{path('delete_user', {id:user.id} )}}">Delete</a>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    {{ include('flashes/_flash.html.twig') }}
+        
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in user_list %}
+            <tr>
+                <th>{{ loop.index }}</th>
+                <td>{{ user.name }}</td>
+                <td>{{ user.surname }}</td>
+                <td>{{ user.roles[0] }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <a class="link-secondary link-underline-opacity-0" href="{{path('update_user', {id:user.id} )}}">Update</a>
+                
+                    <a class="link-danger link-underline-opacity-0"  href="{{path('delete_user', {id:user.id} )}}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

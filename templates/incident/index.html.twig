@@ -2,87 +2,97 @@
 
 {% block title %}Hello IncidentController!{% endblock %}
 
+
+{% block body_id "incident_list" %}
 {% block body %}
+<div class="">
+    <h2> Incidents list </h2>
 
-<h2> Incidents list </h2>
+    {{ include('flashes/_flash.html.twig') }}
+    
+    <table class="table table-striped">
 
-{{ include('flashes/_flash.html.twig') }}
-   
-<table class="table table-striped">
-
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Description</th>
-            <th>Priority</th>
-            <th>State</th>
-            <th>Start date</th>
-            <th>Finish date</th>
-            <th>Assigned to</th>
-            <th>Observations</th>
-            <th>Files</th>
-            <th>Modify </th>
-            <th>Remove Incident</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for incident in incidents %}
-        <tr>
-            <th>{{ loop.index }}</th>
-            <td>{{ incident.description }}</td>
-            <td>{{ incident.priority }}</td>
-            <td>
-            {% if incident.state == 'open' %}
-                <p class="text-success">{{ incident.state }}</p>
-            {% else %}
-                <p class="text-danger">{{ incident.state }}</p>
-            {% endif %}
-            </td>
-            <td>{{ incident.startDate|date }}</td>
-            <td>
-            {% if incident.finishDate %}
-                {{ incident.finishDate|date }}
-            {% else %}
-                - -
-            {% endif %}
-            </td>
-            <td>{{ incident.assigned }}</td>
-            <td>{{ incident.observations }}</td>
-
-            <td>
-            {% if incident.brochureFilename %}
-                <a href="{{ asset('uploads/brochures/' ~ incident.brochureFilename) }}">View PDF</a>
-
-                <a href="{{ path('download_incident', {id:incident.id})}}">Download</a>
-            {% else %}
-                <p>No files attached</p>
-            {% endif %}
-            </td>
-            <td>
-                {% if incident.assigned == username %}
-                    <a class="link-secondary link-underline-opacity-0" href="{{path('update_incident', {id:incident.id} )}}">
-                    Edit <i class="fa-regular fa-pen-to-square"></i>
-                    </a>
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>State</th>
+                <th>Start date</th>
+                <th>Finish date</th>
+                <th>Assigned to</th>
+                <th>Observations</th>
+                <th>Files</th>
+                <th>Modify </th>
+                <th>Remove Incident</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for incident in incidents %}
+            <tr>
+                <th>{{ loop.index }}</th>
+                <td>{{ incident.description }}</td>
+                <td>{{ incident.priority }}</td>
+                <td>
+                {% if incident.state == 'open' %}
+                    <p class="text-success">{{ incident.state }}</p>
                 {% else %}
-                    <a class="link-secondary link-underline-opacity-0 disabled" href="#">
-                    Edit <i class="fa-regular fa-pen-to-square"></i>
-                    </a>
+                    <p class="text-danger">{{ incident.state }}</p>
                 {% endif %}
-            </td>
-            <td>
-                <a class="link-danger link-underline-opacity-0" href="{{path('delete_incident', {id:incident.id} )}}">
-                   Delete <i class="fa-regular fa-trash-can"></i>
-                </a>
-                <a class="link-secondary link-underline-opacity-0" href="{{path('pdf', {id:incident.id} )}}">
-                   Resume
-                </a>
-                <a class="link-secondary link-underline-opacity-0" href="{{path('zip', {id:incident.id} )}}">
-                   Zip
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+                </td>
+                <td>{{ incident.startDate|date }}</td>
+                <td>
+                {% if incident.finishDate %}
+                    {{ incident.finishDate|date }}
+                {% else %}
+                    - -
+                {% endif %}
+                </td>
+                <td>{{ incident.assigned }}</td>
+                <td>{{ incident.observations }}</td>
+
+                <td>
+                {% if incident.brochures %}
+                    {% for brochures in incident.brochures %}
+
+                        <a href="{{ asset('uploads/brochures/' ~ brochures.fileName) }}">View PDF</a>
+
+                        <a href="{{ path('download_incident', {id:brochures.id})}}">Download</a>
+                    {% endfor %}
+                {% else %}
+                    <p>No files attached</p>
+                {% endif %}
+                </td>
+                <td>
+                    {% if incident.assigned == username %}
+                        <a class="link-secondary link-underline-opacity-0" href="{{path('update_incident', {id:incident.id} )}}">
+                        Edit <i class="fa-regular fa-pen-to-square"></i>
+                        </a>
+                    {% else %}
+                        <a class="link-secondary link-underline-opacity-0 disabled" href="#">
+                        Edit <i class="fa-regular fa-pen-to-square"></i>
+                        </a>
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="link-danger link-underline-opacity-0" href="{{path('delete_incident', {id:incident.id} )}}">
+                    Delete <i class="fa-regular fa-trash-can"></i>
+                    </a>
+                    <a class="link-secondary link-underline-opacity-0" href="{{path('pdf_live', {id:incident.id} )}}">
+                    View Resume PDF
+                    </a>
+                    <a class="link-secondary link-underline-opacity-0" href="{{path('pdf_local', {id:incident.id} )}}">
+                    Local PDF 
+                    </a>
+                    <a class="link-secondary link-underline-opacity-0" href="{{path('zip', {id:incident.id} )}}">
+                    Zip
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
 
 {% endblock %}
